@@ -84,8 +84,9 @@ public class MyFragment extends Fragment {
 
     }
     public void addData() throws IOException, JSONException {
-        String jsonDataString=readDataFromFile(R.raw.bhajan_list);
-        JSONArray jsonArray=new JSONArray(jsonDataString);
+        StringBuffer buffer=new StringBuffer();
+        buffer.append(readDataFromFile(R.raw.bhajan_list));
+        JSONArray jsonArray=new JSONArray(buffer.toString());
         for (int i=0;i<jsonArray.length();i++){
             JSONObject jsonObject=jsonArray.getJSONObject(i);
             String nepali_bhajan=jsonObject.getString("bhajan_nepali");
