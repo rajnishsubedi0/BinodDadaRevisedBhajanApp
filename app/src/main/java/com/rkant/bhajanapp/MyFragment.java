@@ -40,9 +40,7 @@ public class MyFragment extends Fragment {
 
        return new MyFragment();
     }
-    public void Toster(){
-        Toast.makeText(getContext(), "HEHE", Toast.LENGTH_SHORT).show();
-    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,9 +82,9 @@ public class MyFragment extends Fragment {
 
     }
     public void addData() throws IOException, JSONException {
-        StringBuffer buffer=new StringBuffer();
-        buffer.append(readDataFromFile(R.raw.bhajan_list));
-        JSONArray jsonArray=new JSONArray(buffer.toString());
+        StringBuilder builder=new StringBuilder();
+        builder.append(readDataFromFile(R.raw.bhajan_list));
+        JSONArray jsonArray=new JSONArray(builder.toString());
         for (int i=0;i<jsonArray.length();i++){
             JSONObject jsonObject=jsonArray.getJSONObject(i);
             String nepali_bhajan=jsonObject.getString("bhajan_nepali");
