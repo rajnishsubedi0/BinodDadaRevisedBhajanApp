@@ -1,11 +1,14 @@
 package com.rkant.bhajanapp;
 
+import static com.rkant.bhajanapp.MyFragment.newInstanceOfFragment;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuItemCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -40,15 +44,11 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
     MenuItem menuItem,favourite_bhajan_menuItem;
     SearchView searchView;
-    RecyclerView recyclerView;
-    RecyclerAdapter recyclerCustomAdapter;
-    Boolean backPressed=false;
-   ArrayList<DataHolder> arrayList;
+   Boolean backPressed=false;
+
    ActionBarDrawerToggle toggle;
    DrawerLayout drawerLayout;
-   NavigationView navigationView;
-ArrayList<com.rkant.bhajanapp.FirstActivities.DataHolder> nepaliNumbers;
-AdapterView.OnItemSelectedListener listener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,20 +56,11 @@ AdapterView.OnItemSelectedListener listener;
         setContentView(R.layout.activity_main);
 
         setNavigationView();
+        FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
+        ft.add(R.id.my_frame_layout,new MyFragment());
+        ft.commit();
 
 
-        recyclerView=findViewById(R.id.recyclerView);
-        arrayList=new ArrayList<>();
-        nepaliNumbers=new ArrayList<>();
-        try {
-            addData();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-
-        settingAdapter();
 
 
 
@@ -89,10 +80,14 @@ AdapterView.OnItemSelectedListener listener;
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.nav_home:
-                        // Handle Home action
+                        getSupportFragmentManager().popBackStack();
                         break;
                     case R.id.nav_gallery:
-                        // Handle Gallery action
+
+                        FragmentTransaction ft2=getSupportFragmentManager().beginTransaction();
+                        ft2.replace(R.id.my_frame_layout,new BlankFragmentr());
+                        ft2.addToBackStack(null);
+                        ft2.commit();
                         break;
                     case R.id.nav_slideshow:
                         // Handle Slideshow action
@@ -105,59 +100,6 @@ AdapterView.OnItemSelectedListener listener;
     }
 
 
-
-
-    private void settingAdapter() {
-        recyclerCustomAdapter=new RecyclerAdapter(arrayList,listener,MainActivity.this,nepaliNumbers);
-        RecyclerView.LayoutManager layoutManager=new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(recyclerCustomAdapter);
-
-
-    }
-
-    public void addData() throws IOException, JSONException {
-        String jsonDataString=readDataFromFile(R.raw.bhajan_list);
-        JSONArray jsonArray=new JSONArray(jsonDataString);
-        for (int i=0;i<jsonArray.length();i++){
-            JSONObject jsonObject=jsonArray.getJSONObject(i);
-            String nepali_bhajan=jsonObject.getString("bhajan_nepali");
-            String bhajan_english_for_search=jsonObject.getString("bhajan_english");
-            String id=jsonObject.getString("id");
-            arrayList.add( new DataHolder(nepali_bhajan,bhajan_english_for_search,id));
-        }
-        String jsonData=readDataFromFile(R.raw.nepali_numbers);
-        JSONArray array=new JSONArray(jsonData);
-        for (int j=0;j<array.length();j++){
-            String strr=array.getString(j);
-            nepaliNumbers.add(new com.rkant.bhajanapp.FirstActivities.DataHolder(strr));
-           // Toast.makeText(this, ""+strr, Toast.LENGTH_SHORT).show();
-
-        }
-
-
-    }
-
-    public String readDataFromFile(int i) throws IOException {
-
-        InputStream inputStream=null;
-        StringBuilder builder=new StringBuilder();
-        try{
-            String jsonString=null;
-            inputStream=getResources().openRawResource(i);
-            BufferedReader bufferedReader=new BufferedReader(
-                    new InputStreamReader(inputStream,"UTF-8"));
-            while ((jsonString=bufferedReader.readLine()) !=null){
-                builder.append(jsonString);
-            }
-        }
-        finally {
-            if(inputStream != null){
-                inputStream.close();
-            }
-        }
-        return new String(builder);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -186,14 +128,9 @@ AdapterView.OnItemSelectedListener listener;
 
             @Override
             public boolean onQueryTextChange(String s) {
-                ArrayList<DataHolder> filteredList=new ArrayList<>();
-                for(int a=0; a< arrayList.size(); a++){
-                    DataHolder item=arrayList.get(a);
-                    if (item.getBhajan_name_nepali().toLowerCase().contains(s.toString().toLowerCase()) || item.getBhajan_name_english().toLowerCase().contains(s.toString().toLowerCase()) ){
-                        filteredList.add(item);
-                    }
-                }
-                recyclerCustomAdapter.filterList(filteredList);
+                MyFragment fragment = (MyFragment) getSupportFragmentManager().findFragmentById(R.id.my_frame_layout);
+                assert fragment != null;
+                fragment.onTextChange_my(s);
                 return false;
             }
 

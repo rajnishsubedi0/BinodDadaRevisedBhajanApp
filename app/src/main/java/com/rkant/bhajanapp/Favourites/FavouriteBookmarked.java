@@ -41,8 +41,8 @@ public class FavouriteBookmarked extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        recyclerView = findViewById(R.id.recyclerView);
+        setContentView(R.layout.fragment_my);
+        recyclerView = findViewById(R.id.recyclerView_frag);
         publicArrayList = new ArrayList<>();
         notPublicArrayList = new ArrayList<>();
         nepaliNumberArrayList = new ArrayList<>();
